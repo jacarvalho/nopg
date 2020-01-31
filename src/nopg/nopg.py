@@ -234,6 +234,7 @@ class NOPG:
         :type dim: int
         :return: a normalized tensor, summing to 1 along dim
         """
+        torch.nn.functional.normalize()
         tmp = X / X.sum(dim=dim, keepdim=True)
         tmp[torch.isnan(tmp)] = 0.
         return tmp
