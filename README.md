@@ -38,7 +38,7 @@ The easiest way to create an experiment is to follow the template in [examples/t
 
 **Swing-up Pendulum with Uniformly sampled dataset and Deterministic Policy**
 
-Run the code with 
+Activate the virtual environment first and run the code with 
 ```python
 python examples/pendulum_nopg_d_uniform.py
 ```
