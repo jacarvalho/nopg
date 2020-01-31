@@ -42,11 +42,3 @@ python examples/pendulum_nopg_d_uniform.py
 ```
 You should get roughly a non-discounted return close to -500.
 
-
-## TODO
-
-- Save policy parameters to a results directory and load
-- Lunar Lander experiment (remove sources of randomness and set fixed initial state)
-- LQR gym-like environment
-- Another method for bandwidth computation
-- Reduce memory consumption (don't store whole P, compute intermediate gradient. This is particularly important when doing MC sampling)
