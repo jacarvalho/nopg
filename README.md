@@ -8,13 +8,15 @@
 
 <br>
 
+Tosatto, S.; Carvalho, J.; Abdulsamad, H.; Peters, J. (2020). *A Nonparametric Off-Policy Policy Gradient*, Proceedings of the 23rd International Conference on Artificial Intelligence and Statistics (AISTATS). [https://arxiv.org/abs/2001.02435](https://arxiv.org/abs/2001.02435)
+
 [Nonparametric Off-Policy Policy Gradient](https://arxiv.org/abs/2001.02435) (NOPG) is a Reinforcement Learning algorithm for off-policy datasets. The gradient estimate is computed in closed-form by modelling the transition probabilities with Kernel Density Estimation (KDE) and the reward function with Kernel Regression.
 
 The current version of NOPG supports stochastic and deterministic policies, and works for continuous state and action spaces. An extension to discrete spaces will be made available in the near future.
 
 It supports environments with openAI-gym like interfaces.
 
-Link to arXiv: [https://arxiv.org/abs/2001.02435](https://arxiv.org/abs/2001.02435)
+
 
 ## Install
 
