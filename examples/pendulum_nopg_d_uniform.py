@@ -65,7 +65,7 @@ nopg_params = {'initial_states': np.array([-1., 0., 0.]).reshape((-1, 3)),
 
 nopg = NOPG(dataset, policy, **nopg_params)
 
-n_policy_updates = 1000
+n_policy_updates = 50
 def optimizer(x): return optim.Adam(x, lr=1e-2)
 evaluation_params = {'eval_mdp': mdp,
                      'eval_every_n': 200,

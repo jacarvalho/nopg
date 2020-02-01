@@ -226,7 +226,7 @@ class NOPG:
     @staticmethod
     def normalize(X, dim=1):
         """
-        Normalize X to sum up to 1 along dim.
+        Normalize X to sum up to 1 along dim, with l1-norm.
 
         :param X: the tensor to normalize
         :type X: torch.tensor
@@ -234,9 +234,7 @@ class NOPG:
         :type dim: int
         :return: a normalized tensor, summing to 1 along dim
         """
-        tmp = X / X.sum(dim=dim, keepdim=True)
-        tmp[torch.isnan(tmp)] = 0.
-        return tmp
+        return F.normalize(X, p=1, dim=dim)
 
     def compute_q_mu(self):
         """
