@@ -1,8 +1,8 @@
 # Nonparametric Off-Policy Policy Gradient
 
 <p float="middle">
-  <img src="img/nopg.png" width="100" />
-  <a href="https://www.youtube.com/watch?v=LKtnzc4TV98"> <img src="img/cartpole.gif" width="100"> </a>
+  <img src="img/nopg.png" width="400" />
+  <a href="https://www.youtube.com/watch?v=LKtnzc4TV98"> <img src="img/cartpole.gif" width="400"> </a>
 </p>
 
 
