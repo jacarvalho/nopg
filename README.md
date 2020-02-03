@@ -1,10 +1,10 @@
 # Nonparametric Off-Policy Policy Gradient
 
+<p float="middle">
+  <img src="img/nopg.png" width="100" />
+  <a href="https://www.youtube.com/watch?v=LKtnzc4TV98"> <img src="img/cartpole.gif" width="100"> </a>
+</p>
 
-<div align="center">
-
-<img src="img/nopg.png" alt="Paris" style="display: block; margin-left: auto; margin-right: auto; width: 30%;">
-</div>
 
 <br>
 
@@ -16,6 +16,7 @@ The current version of NOPG supports stochastic and deterministic policies, and 
 
 It supports environments with openAI-gym like interfaces.
 
+Link to CartPole video: [https://www.youtube.com/watch?v=LKtnzc4TV98](https://www.youtube.com/watch?v=LKtnzc4TV98)
 
 
 ## Install

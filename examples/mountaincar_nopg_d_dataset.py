@@ -26,7 +26,7 @@ filename = '../datasets/mountaincar/10_trajectories.npy'
 dataset = Dataset()
 dataset.load_trajectories_from_file(filename, n_trajectories=5)
 dataset.update_dataset_internal()
-s_band_factor = [10., 10.]
+s_band_factor = [1., 1.]
 s_n_band_factor = s_band_factor
 a_band_factor = [50.]
 dataset.kde_bandwidths_internal(s_band_factor=s_band_factor, a_band_factor=a_band_factor,
@@ -48,14 +48,14 @@ policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
 
 nopg_params = {'initial_states': np.array([env.reset() for _ in range(15)]),  # For multiple initial states
                'gamma': 0.99,
-               'MC_samples_P': 20,
+               'MC_samples_P': 15,
                'sparsify_P': {'kl_max': 0.0001, 'kl_interval_k': 20, 'kl_repeat_every_n_iterations': 200}
                }
 
 nopg = NOPG(dataset, policy, **nopg_params)
 
 n_policy_updates = 1000
-def optimizer(x): return optim.Adam(x, lr=1e-3)
+def optimizer(x): return optim.Adam(x, lr=1e-2)
 evaluation_params = {'eval_mdp': mdp,
                      'eval_every_n': 200,
                      'eval_n_episodes': 1,
