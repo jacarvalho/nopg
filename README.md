@@ -2,7 +2,7 @@
 
 <p float="middle">
   <img src="img/nopg.png" width="400" />
-  <a href="https://www.youtube.com/watch?v=LKtnzc4TV98"> <img src="img/cartpole.gif" width="400" hspace="60"> </a>
+  <a href="https://www.youtube.com/watch?v=LKtnzc4TV98"> <img src="img/cartpole.gif" width="400" hspace="40"> </a>
 </p>
 
 
