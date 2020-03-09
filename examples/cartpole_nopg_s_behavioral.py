@@ -18,7 +18,7 @@ register(
     id='CartpoleStabShort-v1',
     entry_point='quanser_robots.cartpole.cartpole:Cartpole',
     max_episode_steps=10000,
-    kwargs={'fs': 500.0, 'fs_ctrl': 500.0, 'stabilization': True, 'long_pole': False}
+    kwargs={'fs': 50.0, 'fs_ctrl': 50.0, 'stabilization': True, 'long_pole': False}
 )
 env = gym.make('CartpoleStabShort-v1')
 mdp = MDP(env)
@@ -28,7 +28,7 @@ mdp = MDP(env)
 
 sampling_params = {'sampling_type': 'behavioral',
                    'policy': lambda x: np.random.uniform(low=-5., high=5., size=(1,)),
-                   'n_samples': 3000,
+                   'n_samples': 1500,
                    }
 
 dataset = mdp.get_samples(**sampling_params)
