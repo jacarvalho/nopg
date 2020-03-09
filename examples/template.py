@@ -30,7 +30,7 @@ actions = mdp.discretize_space(space='action', levels=[2])
 sampling_params = {'sampling_type': 'uniform',
                    'states': states,
                    'actions': actions,
-                   'transform_to_internal_state': lambda x: (math.atan2(x[1], x[0]), x[2]),
+                   'transform_to_internal_state': lambda x: (math.atan2(x[1], x[0]), x[2]),  # use when the obsevation and state space do not exactly match
                    'render': False
                    }
 

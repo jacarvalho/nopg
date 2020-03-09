@@ -80,7 +80,7 @@ class Policy(nn.Module):
         return out
 
 
-def policy_gmm(x):
+def policy_gmm(x=None):
     """
     Samples from a Gaussian Mixture Model.
     """
@@ -89,14 +89,23 @@ def policy_gmm(x):
     return np.random.normal(loc=means[z], scale=1.0, size=(1,))
 
 
-def policy_uniform(x):
+def policy_gmm_5volts(x=None):
+    """
+    Samples from a Gaussian Mixture Model.
+    """
+    means = [-5., 5.]
+    z = np.random.choice(2)
+    return np.random.normal(loc=means[z], scale=3.0, size=(1,))
+
+
+def policy_uniform(x=None, a=5.):
     """
     Samples from a Uniform distribution.
     """
-    return np.random.uniform(low=-5., high=5., size=(1,))
+    return np.random.uniform(low=-a, high=a, size=(1,))
 
 
-def mountaincar_policy(x):
+def mountaincar_policy(x=None):
     """
     Actions from the user for the mountaincar environment.
     """

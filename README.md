@@ -21,7 +21,7 @@ Link to CartPole video: [https://www.youtube.com/watch?v=LKtnzc4TV98](https://ww
 
 ## Install
 
-The code was tested with Python 3.6.8 in a machine with Ubuntu 18.04 and uses PyTorch for automatic gradient computation. We recommend using a GPU and large RAM to improve the training speed.
+The code was tested with Python 3.7.6 in a machine with Ubuntu 18.04 and uses PyTorch for automatic gradient computation. We recommend using a GPU and large RAM to improve the training speed.
 
 We assume you have `miniconda3` installed in `/home/$USER/miniconda3`. 
 

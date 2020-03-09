@@ -17,6 +17,12 @@ class MDP:
         self._env = env
         self.s_dim = np.prod(env.observation_space.shape)
         self.a_dim = np.prod(env.action_space.shape)
+        self._quanser_robots = False
+        try:
+            if 'quanser_robots' in str(type(env.dyn)):
+                self._quanser_robots = True
+        except AttributeError:
+            pass
 
     def get_samples(self, sampling_type=None, states=None, actions=None, transform_to_internal_state=lambda x: x,
                     policy=None, n_samples=None, n_trajectories=None, initial_state=None, max_ep_transitions=100,
@@ -61,7 +67,10 @@ class MDP:
             for state in states:
                 for action in actions:
                     self._env.reset()
-                    self._env.env.state = np.copy(transform_to_internal_state(state))
+                    if self._quanser_robots:
+                        self._env.env._sim_state = np.copy(transform_to_internal_state(state))
+                    else:
+                        self._env.env.state = np.copy(transform_to_internal_state(state))
                     state_next, rew, done, _ = self._env.step(action)
                     dataset.add_trajectory([(state, action, rew, state_next, done)])
         elif sampling_type == 'behavioral':
@@ -74,19 +83,22 @@ class MDP:
             elif n_trajectories is not None:
                 criteria = n_trajectories
             while i < criteria:
-                if render:
-                    self._env.render()
                 if press_enter_to_start:
+                    if render:
+                        self._env.render()
                     input("Press ENTER to start")
                 state = self._env.reset()
                 if initial_state is not None:
                     state = initial_state
-                    self._env.env.state = np.copy(transform_to_internal_state(state))
+                    if self._quanser_robots:
+                        self._env.env._sim_state = np.copy(transform_to_internal_state(state))
+                    else:
+                        self._env.env.state = np.copy(transform_to_internal_state(state))
                 trajectory = []
                 for j in range(max_ep_transitions):
                     if render:
                         self._env.render()
-                    action = behavioral_policy(state)
+                    action = behavioral_policy(x=state)
                     state_next, rew, done, _ = self._env.step(action)
                     trajectory.append((state, action, rew, state_next, done))
                     n_samples_collected += 1
@@ -126,7 +138,10 @@ class MDP:
             state = self._env.reset()
             if initial_state is not None:
                 state = initial_state
-                self._env.env.state = np.copy(transform_to_internal_state(state))
+                if self._quanser_robots:
+                    self._env.env._sim_state = np.copy(transform_to_internal_state(state))
+                else:
+                    self._env.env.state = np.copy(transform_to_internal_state(state))
             for j in range(self._env._max_episode_steps):
                 with torch.no_grad():
                     state = torch.tensor(state, device=DEVICE, dtype=TORCH_DTYPE)

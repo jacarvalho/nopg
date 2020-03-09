@@ -101,12 +101,13 @@ class NOPG:
         """
         if self._MC_samples_P is not None:
             kernel_s_n = MultivariateNormal(loc=self._states_next.repeat(self._MC_samples_P, 1),
-                                            covariance_matrix=torch.diag(self._s_n_bandwidth))
+                                            covariance_matrix=torch.diag(self._s_n_bandwidth.pow(2)))
             self._P = self.eps_matrix(kernel_s_n.sample(), self._states).reshape(
                 self._MC_samples_P, self._n_samples, self._n_samples).mean(dim=0)
 
         else:
-            kernel_s_n = MultivariateNormal(loc=self._states_next, covariance_matrix=torch.diag(self._s_n_bandwidth))
+            kernel_s_n = MultivariateNormal(loc=self._states_next,
+                                            covariance_matrix=torch.diag(self._s_n_bandwidth.pow(2)))
             self._P = self.eps_matrix(kernel_s_n.mean, self._states)
         # In terminal states, the rows of P are set to zero
         idxs_terminal = self._dones.nonzero(as_tuple=True)[0]

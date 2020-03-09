@@ -21,6 +21,7 @@ setup(name='nopg',
           'sklearn==0.0',
           'torch==1.4.0',
           'jupyter==1.0.0',
-          'Box2D-py==2.3.8'
+          'Box2D-py==2.3.8',
+          'seaborn'
       ],
       )

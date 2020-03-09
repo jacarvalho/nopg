@@ -2,7 +2,7 @@
 
 # Setup a conda environment and install packages
 source /home/$USER/miniconda3/etc/profile.d/conda.sh
-conda create -n nopg python=3.6.8
+conda create -n nopg python=3.7.4
 conda activate nopg
 
 pip install -e .

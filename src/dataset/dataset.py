@@ -4,13 +4,17 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KernelDensity
 from scipy.stats import gaussian_kde
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from src.utils.utils import NP_DTYPE
+
+plt.style.use('seaborn-darkgrid')
 
 
 class Dataset:
 
-    def __init__(self):
+    def __init__(self, results_dir=None):
         """
         Class to manage transitions (state, action, reward, state_next, dones).
         """
@@ -23,6 +27,7 @@ class Dataset:
         self._s_bandwidth = None
         self._a_bandwidth = None
         self._s_n_bandwidth = None
+        self._results_dir = results_dir
 
     def add_trajectory(self, trajectory):
         """
@@ -83,6 +88,7 @@ class Dataset:
         :param cv_folds: k-fold cross validation
         :type cv_folds: int
         """
+        self.update_dataset_internal()
         states, actions, states_next = self._states, self._actions, self._states_next
         print("Computing kernel bandwidths with Cross-Validation...")
         print('#samples: {}'.format(states.shape[0]))
@@ -141,3 +147,17 @@ class Dataset:
             idxs = np.random.choice(np.arange(trajectories.shape[0]), replace=False,
                                     size=min(n_trajectories, len(trajectories)))
             self._trajectories = trajectories[idxs]
+
+    def plot_data_kde(self):
+        self.update_dataset_internal()
+        # States
+        fig, ax = plt.subplots(self._states.shape[1])
+        for dim in range(self._states.shape[1]):
+            n = 1000
+            xs = np.linspace(np.min(self._states[:, dim]), np.max(self._states[:, dim]), n)
+            kde = gaussian_kde(self._states[:, dim].reshape((-1, 1)), bw_method=self._s_bandwidth[dim])
+            ax.plot(xs, kde(xs))
+            plt.show()
+
+        # Actions
+
