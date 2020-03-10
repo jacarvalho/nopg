@@ -5,16 +5,17 @@ from sklearn.neighbors import KernelDensity
 from scipy.stats import gaussian_kde
 import os
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from src.utils.utils import NP_DTYPE
 
+# Matplotlib settings
 plt.style.use('seaborn-darkgrid')
+plt.rcParams['savefig.format'] = 'png'
 
 
 class Dataset:
 
-    def __init__(self, results_dir=None):
+    def __init__(self, results_dir='/tmp/'):
         """
         Class to manage transitions (state, action, reward, state_next, dones).
         """
@@ -27,7 +28,7 @@ class Dataset:
         self._s_bandwidth = None
         self._a_bandwidth = None
         self._s_n_bandwidth = None
-        self._results_dir = results_dir
+        self._results_dir = os.path.abspath(results_dir)
 
     def add_trajectory(self, trajectory):
         """
@@ -148,16 +149,33 @@ class Dataset:
                                     size=min(n_trajectories, len(trajectories)))
             self._trajectories = trajectories[idxs]
 
-    def plot_data_kde(self):
+    def plot_data_kde(self, state_labels=None, action_labels=None):
         self.update_dataset_internal()
+        n_granularity = 1000
         # States
-        fig, ax = plt.subplots(self._states.shape[1])
+        fig, axs = plt.subplots(nrows=self._states.shape[1], ncols=1, figsize=(20, 10))
+        if not isinstance(axs, np.ndarray):
+            axs = np.array(axs).reshape((1,))
         for dim in range(self._states.shape[1]):
-            n = 1000
-            xs = np.linspace(np.min(self._states[:, dim]), np.max(self._states[:, dim]), n)
-            kde = gaussian_kde(self._states[:, dim].reshape((-1, 1)), bw_method=self._s_bandwidth[dim])
-            ax.plot(xs, kde(xs))
-            plt.show()
+            xs = np.linspace(np.min(self._states[:, dim]), np.max(self._states[:, dim]), n_granularity)
+            kde = gaussian_kde(self._states[:, dim], bw_method=1)
+            kde.set_bandwidth(bw_method=self._s_bandwidth[dim]**2)
+            axs[dim].plot(xs, kde.pdf(xs))
+            axs[dim].set_xlabel(state_labels[dim] if state_labels else "s_{}".format(dim))
+        plt.tight_layout()
+        fig_path = os.path.join(self._results_dir, 'kde_states')
+        fig.savefig(fig_path)
 
         # Actions
-
+        fig, axs = plt.subplots(nrows=self._actions.shape[1], ncols=1, figsize=(20, 10))
+        if not isinstance(axs, np.ndarray):
+            axs = np.array(axs).reshape((1,))
+        for dim in range(self._actions.shape[1]):
+            xs = np.linspace(np.min(self._actions[:, dim]), np.max(self._actions[:, dim]), n_granularity)
+            kde = gaussian_kde(self._actions[:, dim], bw_method=1)
+            kde.set_bandwidth(bw_method=self._a_bandwidth[dim]**2)
+            axs[dim].plot(xs, kde.pdf(xs))
+            axs[dim].set_xlabel(action_labels[dim] if action_labels else "a_{}".format(dim))
+        plt.tight_layout()
+        fig_path = os.path.join(self._results_dir, 'kde_actions')
+        fig.savefig(fig_path)

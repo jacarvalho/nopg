@@ -26,7 +26,7 @@ class MDP:
 
     def get_samples(self, sampling_type=None, states=None, actions=None, transform_to_internal_state=lambda x: x,
                     policy=None, n_samples=None, n_trajectories=None, initial_state=None, max_ep_transitions=100,
-                    render=False, press_enter_to_start=False, dataset=None):
+                    render=False, press_enter_to_start=False, dataset=None, results_dir='/tmp/'):
         """
         Collect samples from the mdp.
         If sampling_type is 'uniform', provide the grid of states and actions to samples uniformly from, and
@@ -56,13 +56,15 @@ class MDP:
         :type max_ep_transitions: int
         :param render: render the environment
         :type render: int
-        :param dataset: if a dataset is provided add trajectories to it, else start an empty one
         :param press_enter_to_start: wait for user input to start collecting trajectories
         :type press_enter_to_start: bool
+        :param dataset: if a dataset is provided add trajectories to it, else start an empty one
         :type dataset: Dataset
+        :param results_dir: provide a directory path to save intermediate results
+        :type results_dir: str
         :return: a dataset containing the collected trajectories
         """
-        dataset = dataset if dataset is not None else Dataset()
+        dataset = dataset if dataset is not None else Dataset(results_dir=results_dir)
         if sampling_type == 'uniform':
             for state in states:
                 for action in actions:
@@ -116,7 +118,8 @@ class MDP:
         self._env.close()
         return dataset
 
-    def evaluate(self, policy, n_episodes=1, initial_state=None, transform_to_internal_state=None, render=False):
+    def evaluate(self, policy, n_episodes=1, initial_state=None, transform_to_internal_state=None, render=False,
+                 results_dir='/tmp/'):
         """
         Evaluate a policy on the mdp.
 
@@ -132,7 +135,7 @@ class MDP:
         :type render: bool
         :return: a Dataset with the trajectories
         """
-        dataset = Dataset()
+        dataset = Dataset(results_dir=results_dir)
         for episode in range(n_episodes):
             trajectory = []
             state = self._env.reset()

@@ -283,7 +283,8 @@ class NOPG:
 
     def fit(self, n_policy_updates=100, optimizer=None,
             eval_mdp=None, eval_every_n=50, eval_n_episodes=1, eval_initial_state=None,
-            eval_transform_to_internal_state=None, eval_render=False):
+            eval_transform_to_internal_state=None, eval_render=False,
+            results_dir='/tmp/'):
         """
         Optimizes the parametrized policy with gradient ascent.
 
@@ -320,7 +321,7 @@ class NOPG:
             print(" | J: {:.1f} | Loss: {:.1f}".format(self._objective.item(), self._J.item()))
 
             if i % eval_every_n == 0 or i == n_policy_updates - 1:
-                data = eval_mdp.evaluate(self._policy, **evaluation_params)
+                data = eval_mdp.evaluate(self._policy, **evaluation_params, results_dir=results_dir)
                 _, _, rewards, _, _ = data.get_full_batch()
                 rewards = rewards.reshape(-1)
                 Jenv = np.sum(rewards)

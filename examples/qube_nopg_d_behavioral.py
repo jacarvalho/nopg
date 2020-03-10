@@ -17,7 +17,7 @@ from src.nopg.nopg import NOPG
 register(
     id='Qube-100-v1',
     entry_point='quanser_robots.qube.qube:Qube',
-    max_episode_steps=600,
+    max_episode_steps=1000,
     kwargs={'fs': 200.0, 'fs_ctrl': 200.0}
 )
 env = gym.make('Qube-100-v1')
@@ -25,15 +25,17 @@ mdp = MDP(env)
 
 ##########################################################################################
 # Gather an Off-Policy Dataset
+results_dir = '/tmp/'
 
 sampling_params = {'sampling_type': 'behavioral',
                    'initial_state': np.array([1., 0., -1., 0., 0., 0.], dtype=NP_DTYPE),
                    'transform_to_internal_state': lambda x: (math.atan2(x[1], x[0]), math.atan2(x[3], x[2]), x[4], x[5]),
                    # 'policy': policy_gmm_5volts,
                    'policy': policy_uniform,
-                   'n_samples': 1500,
-                   'max_ep_transitions': 200,
-                   'render': True
+                   'n_samples': 2000,
+                   'max_ep_transitions': 150,
+                   'render': True,
+                   'results_dir': results_dir
                    }
 
 dataset = mdp.get_samples(**sampling_params)
@@ -45,7 +47,7 @@ a_band_factor = [1.]  # Pendulum uniform
 dataset.kde_bandwidths_internal(s_band_factor=s_band_factor, a_band_factor=a_band_factor,
                                 s_n_band_factor=s_n_band_factor)
 
-dataset.plot_data_kde()
+dataset.plot_data_kde(state_labels=mdp._env.observation_space.labels, action_labels=mdp._env.action_space.labels)
 
 ##########################################################################################
 # Define the Policy Network
@@ -76,7 +78,8 @@ evaluation_params = {'eval_mdp': mdp,
                      'eval_n_episodes': 1,
                      'eval_initial_state': np.array([1., 0., -1., 0., 0., 0.], dtype=NP_DTYPE),  # or None
                      'eval_transform_to_internal_state': lambda x: (math.atan2(x[1], x[0]), math.atan2(x[3], x[2]), x[4], x[5]),
-                     'eval_render': True
+                     'eval_render': True,
+                     'results_dir': results_dir
                      }
 
 nopg.fit(n_policy_updates=n_policy_updates, optimizer=optimizer, **evaluation_params)
