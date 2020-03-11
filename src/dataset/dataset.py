@@ -32,7 +32,7 @@ class Dataset:
 
     def add_trajectory(self, trajectory):
         """
-        Appends a trajectory. A trajectory is a list of tuples with transitions.
+        Appends a trajectory. A trajectory is a list of tuples with transitions (s, a, r, s_n, d).
 
         :param trajectory: list of transitions
         :type trajectory: list
