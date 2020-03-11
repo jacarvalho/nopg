@@ -34,7 +34,7 @@ os.makedirs(results_dir, exist_ok=True)
 # Load trajectories from file
 filename = '../datasets/qube/10_trajectories.npy'
 dataset = Dataset(results_dir=results_dir)
-dataset.load_trajectories_from_file(filename, n_trajectories=5)
+dataset.load_trajectories_from_file(filename, n_trajectories=10)
 dataset.update_dataset_internal()
 s_band_factor = [10., 10., 10., 10., 10., 10.]
 s_n_band_factor = s_band_factor
