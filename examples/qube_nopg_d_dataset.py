@@ -34,11 +34,11 @@ os.makedirs(results_dir, exist_ok=True)
 # Load trajectories from file
 filename = '../datasets/qube/10_trajectories.npy'
 dataset = Dataset(results_dir=results_dir)
-dataset.load_trajectories_from_file(filename, n_trajectories=10)
+dataset.load_trajectories_from_file(filename, n_trajectories=2)
 dataset.update_dataset_internal()
-s_band_factor = [10., 10., 10., 10., 10., 10.]
+s_band_factor = [10., 10., 10., 10., 5., 5.]
 s_n_band_factor = s_band_factor
-a_band_factor = [20.]
+a_band_factor = [10.]
 dataset.kde_bandwidths_internal(s_band_factor=s_band_factor, a_band_factor=a_band_factor,
                                 s_n_band_factor=s_n_band_factor)
 dataset.plot_data_kde(state_labels=mdp._env.observation_space.labels, action_labels=mdp._env.action_space.labels)
@@ -59,9 +59,9 @@ policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
 # Optimize the policy with NOPG
 
 nopg_params = {'initial_states': np.array([env.reset() for _ in range(5)]),  # For multiple initial states
-               'gamma': 0.99,
+               'gamma': 0.999,
                # 'MC_samples_P': 15,
-               # 'sparsify_P': {'kl_max': 0.0001, 'kl_interval_k': 20, 'kl_repeat_every_n_iterations': 200}
+               # 'sparsify_P': {'kl_max': 0.001, 'kl_interval_k': 20, 'kl_repeat_every_n_iterations': 200}
                }
 
 nopg = NOPG(dataset, policy, **nopg_params)
