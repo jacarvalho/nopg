@@ -17,7 +17,7 @@ from src.nopg.nopg import NOPG
 register(
     id='Qube-100-v1',
     entry_point='quanser_robots.qube.qube:Qube',
-    max_episode_steps=1000,
+    max_episode_steps=1500,
     kwargs={'fs': 200.0, 'fs_ctrl': 200.0}
 )
 env = gym.make('Qube-100-v1')
