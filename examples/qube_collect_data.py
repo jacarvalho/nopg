@@ -17,7 +17,7 @@ register(
 env = GentlyTerminating(gym.make('Qube-100-v1'))
 
 dataset = Dataset()
-n_trajectories = 10
+n_trajectories = 15
 for traj in range(n_trajectories):
     trajectory = []
     ctrl = SwingUpCtrl()
@@ -35,6 +35,7 @@ for traj in range(n_trajectories):
     dataset.add_trajectory(trajectory)
 
 dataset.update_dataset_internal()
+print(np.sum(dataset._rewards))
 
 filename = "../datasets/qube/{}_trajectories.npy".format(n_trajectories)
 dataset.save_trajectories_to_file(filename)

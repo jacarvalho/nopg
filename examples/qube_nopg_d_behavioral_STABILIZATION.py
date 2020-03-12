@@ -8,9 +8,12 @@ import torch.nn as nn
 
 from src.mdp.mdp import MDP
 from src.policy.policy import Policy, policy_gmm_5volts, policy_uniform
-from src.utils.utils import DEVICE, TORCH_DTYPE, NP_DTYPE
+from src.configs.configs import TORCH_DTYPE, NP_DTYPE
 from src.nopg.nopg import NOPG
 
+# Use the GPU if available, or if the memory is insufficient use only the CPU
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cpu')
 
 ##########################################################################################
 # Create the Environment (MDP)
@@ -55,7 +58,8 @@ dataset.plot_data_kde(state_labels=mdp._env.observation_space.labels, action_lab
 policy_params = {'policy_class': 'deterministic',
                  'neurons': [mdp.s_dim, 50, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                  'activations': [nn.functional.relu],  # one activation function per hidden layer
-                 'f_out': [lambda x: 5.0 * torch.tanh(x)]
+                 'f_out': [lambda x: 5.0 * torch.tanh(x)],
+                 'device': DEVICE
                  }
 
 policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)

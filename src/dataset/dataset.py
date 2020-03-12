@@ -6,7 +6,7 @@ from scipy.stats import gaussian_kde
 import os
 import matplotlib.pyplot as plt
 
-from src.utils.utils import NP_DTYPE
+from src.configs.configs import NP_DTYPE
 
 # Matplotlib settings
 plt.style.use('seaborn-darkgrid')

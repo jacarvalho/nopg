@@ -4,12 +4,12 @@ from torch import nn
 from torch.distributions import MultivariateNormal
 import getch
 
-from src.utils.utils import DEVICE, TORCH_DTYPE
+from src.configs.configs import TORCH_DTYPE
 
 
 class Policy(nn.Module):
 
-    def __init__(self, policy_class='deterministic', neurons=None, activations=None, f_out=None):
+    def __init__(self, policy_class='deterministic', neurons=None, activations=None, f_out=None, device=None):
         """
         Policy parametrized by a neural network.
         A deterministic policy outputs a single action. A stochastic policy outputs the parameters of a Gaussian, the
@@ -27,6 +27,8 @@ class Policy(nn.Module):
         :type f_out: list (function)
         """
         super(Policy, self).__init__()
+
+        self.device = device
 
         # Policy paameters
         self.policy_class = policy_class
@@ -72,8 +74,8 @@ class Policy(nn.Module):
             mean, cov = self._f_out[0](out[0]), self._f_out[1](out[1])
             # Sample an action from the Gaussian stochastic policy with the reparametrization trick
             n_dim = mean.shape[1] if mean.dim() > 1 else mean.shape[0]
-            m = MultivariateNormal(loc=torch.zeros(n_dim, device=DEVICE, dtype=TORCH_DTYPE),
-                                   covariance_matrix=torch.eye(n_dim, device=DEVICE, dtype=TORCH_DTYPE))
+            m = MultivariateNormal(loc=torch.zeros(n_dim, device=self.device, dtype=TORCH_DTYPE),
+                                   covariance_matrix=torch.eye(n_dim, device=self.device, dtype=TORCH_DTYPE))
             out = mean + cov * m.sample(sample_shape=(mean.shape[0],))
         elif self.policy_class == 'deterministic':
             out = self._f_out[0](out)

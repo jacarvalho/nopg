@@ -7,7 +7,7 @@ from torch.distributions import MultivariateNormal
 from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import bicgstab
 
-from src.utils.utils import DEVICE, TORCH_DTYPE, NP_DTYPE
+from src.configs.configs import TORCH_DTYPE, NP_DTYPE
 
 
 class NOPG:
@@ -39,17 +39,17 @@ class NOPG:
                 n iterations of the policy gradient }
         :type sparsify_P: dict
         """
-        # Dataset
-        self._dataset = dataset
-        self._states, self._actions, self._rewards, self._states_next, self._dones, \
-            self._s_bandwidth, self._a_bandwidth, self._s_n_bandwidth = self.prepare_data()
-        self._initial_states = torch.tensor(initial_states, device=DEVICE, dtype=TORCH_DTYPE)
-        self._n_samples = self._states.shape[0]
-
         # Policy
         self._policy = policy
         if self._policy.policy_class == 'stochastic':
             self._MC_samples_stochastic_policy = MC_samples_stochastic_policy
+
+        # Dataset
+        self._dataset = dataset
+        self._states, self._actions, self._rewards, self._states_next, self._dones, \
+            self._s_bandwidth, self._a_bandwidth, self._s_n_bandwidth = self.prepare_data()
+        self._initial_states = torch.tensor(initial_states, device=self._policy.device, dtype=TORCH_DTYPE)
+        self._n_samples = self._states.shape[0]
 
         # NOPG internals
         self._gamma = gamma
@@ -86,14 +86,14 @@ class NOPG:
         """
         states, actions, rewards, states_next, dones = self._dataset.get_full_batch()
         s_bandwidth, a_bandwidth, s_n_bandwidth = self._dataset.get_bandwidths()
-        return torch.tensor(states, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(actions, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(rewards, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(states_next, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(dones, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(s_bandwidth, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(a_bandwidth, device=DEVICE, dtype=TORCH_DTYPE),\
-            torch.tensor(s_n_bandwidth, device=DEVICE, dtype=TORCH_DTYPE)
+        return torch.tensor(states, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(actions, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(rewards, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(states_next, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(dones, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(s_bandwidth, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(a_bandwidth, device=self._policy.device, dtype=TORCH_DTYPE),\
+            torch.tensor(s_n_bandwidth, device=self._policy.device, dtype=TORCH_DTYPE)
 
     def build_full_P(self):
         """
@@ -132,7 +132,8 @@ class NOPG:
         # Normalize the values along rows, such that P_sparse remains a stochastic matrix
         vals = self.normalize(vals, dim=1).reshape((-1,))
         return torch.sparse_coo_tensor(torch.stack((idxs_rows, idxs_cols), dim=0), vals,
-                                       size=(self._n_samples, self._n_samples), device=DEVICE, dtype=TORCH_DTYPE)
+                                       size=(self._n_samples, self._n_samples),
+                                       device=self._policy.device, dtype=TORCH_DTYPE)
 
     def build_P_sparse(self):
         """
@@ -168,10 +169,11 @@ class NOPG:
                 self.build_P_sparse()
                 self._eye_sparse = torch.sparse_coo_tensor(
                     torch.arange(self._n_samples).repeat(2, 1), torch.ones(self._n_samples),
-                    size=(self._n_samples, self._n_samples), device=DEVICE, dtype=TORCH_DTYPE)
+                    size=(self._n_samples, self._n_samples), device=self._policy.device, dtype=TORCH_DTYPE)
                 self._Lambda_sparse = self._eye_sparse.add(-self._gamma * self._P_sparse)
             else:
-                self._Lambda = torch.eye(self._n_samples, device=DEVICE, dtype=TORCH_DTYPE) - self._gamma * self._P
+                self._Lambda = torch.eye(self._n_samples, device=self._policy.device,
+                                         dtype=TORCH_DTYPE) - self._gamma * self._P
 
     def build_eps_0(self):
         """
@@ -251,11 +253,11 @@ class NOPG:
         eps_0 = self._eps_0.data.to('cpu').numpy()
         # Compute q
         q, info = bicgstab(Lambda, rewards, x0=self._q.to('cpu').numpy() if self._q is not None else None, tol=1e-4)
-        self._q = torch.tensor(q.reshape(-1, 1), device=DEVICE, dtype=TORCH_DTYPE)
+        self._q = torch.tensor(q.reshape(-1, 1), device=self._policy.device, dtype=TORCH_DTYPE)
         # Compute mu
         eps_0 = eps_0.mean(axis=1, keepdims=True)
         mu, info = bicgstab(Lambda.T, eps_0, x0=self._mu.to('cpu').numpy() if self._mu is not None else None, tol=1e-4)
-        self._mu = torch.tensor(mu.reshape(-1, 1), device=DEVICE, dtype=TORCH_DTYPE)
+        self._mu = torch.tensor(mu.reshape(-1, 1), device=self._policy.device, dtype=TORCH_DTYPE)
 
     def policy_gradient(self):
         """

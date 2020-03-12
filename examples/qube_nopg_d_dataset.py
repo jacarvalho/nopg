@@ -8,11 +8,14 @@ import torch.nn as nn
 import os
 
 from src.mdp.mdp import MDP
-from src.policy.policy import Policy, policy_gmm
-from src.utils.utils import DEVICE, TORCH_DTYPE, NP_DTYPE
+from src.policy.policy import Policy
+from src.configs.configs import TORCH_DTYPE
 from src.nopg.nopg import NOPG
 from src.dataset.dataset import Dataset
 
+# Use the GPU if available, or if the memory is insufficient use only the CPU
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cpu')
 
 ##########################################################################################
 # Create the Environment (MDP)
@@ -28,17 +31,17 @@ mdp = MDP(env)
 
 ##########################################################################################
 # Gather an Off-Policy Dataset
-results_dir = '/home/carvalho/Documents/projects/nopg/results/qube/'
+results_dir = '/home/carvalho/Documents/projects/nopg/results/qube/nopgd/'
 os.makedirs(results_dir, exist_ok=True)
 
 # Load trajectories from file
-filename = '../datasets/qube/10_trajectories.npy'
+filename = '/home/carvalho/Documents/projects/nopg/datasets/qube/15_trajectories.npy'
 dataset = Dataset(results_dir=results_dir)
-dataset.load_trajectories_from_file(filename, n_trajectories=1)
+dataset.load_trajectories_from_file(filename, n_trajectories=15)
 dataset.update_dataset_internal()
-s_band_factor = [10., 10., 10., 10., 5., 5.]
+s_band_factor = [15., 15., 15, 15., 1., 1.]
 s_n_band_factor = s_band_factor
-a_band_factor = [15.]
+a_band_factor = [5.]
 dataset.kde_bandwidths_internal(s_band_factor=s_band_factor, a_band_factor=a_band_factor,
                                 s_n_band_factor=s_n_band_factor)
 dataset.plot_data_kde(state_labels=mdp._env.observation_space.labels, action_labels=mdp._env.action_space.labels)
@@ -50,7 +53,8 @@ dataset.plot_data_kde(state_labels=mdp._env.observation_space.labels, action_lab
 policy_params = {'policy_class': 'deterministic',
                  'neurons': [mdp.s_dim, 50, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                  'activations': [nn.functional.relu],  # one activation function per hidden layer
-                 'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                 'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                 'device': DEVICE
                  }
 
 policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -60,18 +64,19 @@ policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
 
 nopg_params = {'initial_states': np.array([env.reset() for _ in range(10)]),  # For multiple initial states
                'gamma': 0.999,
+               # 'MC_samples_stochastic_policy': 20,
                # 'MC_samples_P': 15,
-               # 'sparsify_P': {'kl_max': 0.001, 'kl_interval_k': 20, 'kl_repeat_every_n_iterations': 200}
+               # 'sparsify_P': {'kl_max': 0.001, 'kl_interval_k': 20, 'kl_repeat_every_n_iterations': 5}
                }
 
 nopg = NOPG(dataset, policy, **nopg_params)
 
-n_policy_updates = 1000
+n_policy_updates = 1500
 def optimizer(x): return optim.Adam(x, lr=5e-3)
 evaluation_params = {'eval_mdp': mdp,
                      'eval_every_n': 100,
                      'eval_n_episodes': 1,
-                     'eval_render': True
+                     'eval_render': False
                      }
 
 nopg.fit(n_policy_updates=n_policy_updates, optimizer=optimizer, **evaluation_params)

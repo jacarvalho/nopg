@@ -8,9 +8,12 @@ import torch.nn as nn
 
 from src.mdp.mdp import MDP
 from src.policy.policy import Policy, policy_gmm
-from src.utils.utils import DEVICE, TORCH_DTYPE, NP_DTYPE
+from src.configs.configs import TORCH_DTYPE, NP_DTYPE
 from src.nopg.nopg import NOPG
 
+# Use the GPU if available, or if the memory is insufficient use only the CPU
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cpu')
 
 ##########################################################################################
 # Create the Environment (MDP)
@@ -60,8 +63,10 @@ dataset.kde_bandwidths_internal(s_band_factor=s_band_factor, a_band_factor=a_ban
 policy_params = {'policy_class': 'deterministic',
                  'neurons': [mdp.s_dim, 50, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                  'activations': [nn.functional.relu],  # one activation function per hidden layer
-                 'f_out': [lambda x: 2.0 * torch.tanh(x)]
-                 # NOTE: for a stochastic policy f_out is a list with 2 entries (mean and diagonal covariance)
+                 'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                 'device': DEVICE
+                 # NOTE: for a stochastic policy f_out is a list with 2 entries (mean and diagonal covariance). Use the
+                 #       tanh and sigmoid to limit the output values.
                  # 'policy_class': 'stochastic',
                  # 'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)]
                  }

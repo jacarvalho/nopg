@@ -3,7 +3,7 @@ import torch
 from sklearn.utils.extmath import cartesian
 
 from src.dataset.dataset import Dataset
-from src.utils.utils import DEVICE, TORCH_DTYPE
+from src.configs.configs import TORCH_DTYPE
 
 
 class MDP:
@@ -147,7 +147,7 @@ class MDP:
                     self._env.env.state = np.copy(transform_to_internal_state(state))
             for j in range(self._env._max_episode_steps):
                 with torch.no_grad():
-                    state = torch.tensor(state, device=DEVICE, dtype=TORCH_DTYPE)
+                    state = torch.tensor(state, device=policy.device, dtype=TORCH_DTYPE)
                     action = policy(state).to('cpu').numpy().reshape((-1,))
                     state_next, rew, done, _ = self._env.step(action)
                     trajectory.append((state.to('cpu').numpy(), action, rew, state_next, done))

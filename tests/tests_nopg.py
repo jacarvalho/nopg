@@ -9,9 +9,12 @@ from gym.envs import register
 
 from src.mdp.mdp import MDP
 from src.policy.policy import Policy, policy_gmm
-from src.utils.utils import DEVICE, NP_DTYPE, TORCH_DTYPE
+from src.configs.configs import NP_DTYPE, TORCH_DTYPE
 from src.nopg.nopg import NOPG
 
+# Use the GPU if available, or if the memory is insufficient use only the CPU
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cpu')
 
 register(
     id='Pendulum-v1',
@@ -72,7 +75,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                         'device': DEVICE
                          # NOTE: for a stochastic policy f_out is a list with 2 entries (mean and diagonal covariance)
                          # 'type': 'stochastic',
                          # 'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)]
@@ -139,7 +143,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'stochastic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -199,7 +204,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -260,7 +266,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'stochastic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -322,7 +329,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -380,7 +388,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'stochastic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x), lambda x: 2.0 * torch.sigmoid(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -441,7 +450,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -501,7 +511,8 @@ class TestNOPGpendulum(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 2.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 2.0 * torch.tanh(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
@@ -561,7 +572,8 @@ class TestNOPGcartpole(unittest.TestCase):
         policy_params = {'policy_class': 'deterministic',
                          'neurons': [mdp.s_dim, 10, mdp.a_dim],  # [state_dim, hidden1, ... , hiddenN, action_dim]
                          'activations': [nn.functional.relu],  # one activation function per hidden layer
-                         'f_out': [lambda x: 5.0 * torch.tanh(x)]
+                         'f_out': [lambda x: 5.0 * torch.tanh(x)],
+                         'device': DEVICE
                          }
 
         policy = Policy(**policy_params).to(device=DEVICE, dtype=TORCH_DTYPE)
