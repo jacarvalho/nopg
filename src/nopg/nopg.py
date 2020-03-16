@@ -320,7 +320,7 @@ class NOPG:
             optimizer.step()
 
             print("Policy update {}/{}".format(i, n_policy_updates), end=" ")
-            print(" | J: {:.1f} | Loss: {:.1f}".format(self._objective.item(), self._J.item()))
+            print(" | J: {:.1f} | Loss: {:.1f}".format(self._objective.item(), self._J.item()), flush=True)
 
             if i % eval_every_n == 0 or i == n_policy_updates - 1:
                 data = eval_mdp.evaluate(self._policy, **evaluation_params, results_dir=results_dir)
@@ -328,6 +328,6 @@ class NOPG:
                 rewards = rewards.reshape(-1)
                 Jenv = np.sum(rewards)
                 Jenv_discounted = np.sum(rewards * np.array([self._gamma**i for i in range(len(rewards))]))
-                print("Jenv: {:.1f} | Jenv_discounted: {:.1f}".format(Jenv, Jenv_discounted))
+                print("Jenv: {:.1f} | Jenv_discounted: {:.1f}".format(Jenv, Jenv_discounted), flush=True)
 
             self._iter += 1

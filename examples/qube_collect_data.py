@@ -17,7 +17,7 @@ register(
 env = GentlyTerminating(gym.make('Qube-100-v1'))
 
 dataset = Dataset()
-n_trajectories = 15
+n_trajectories = 1
 for traj in range(n_trajectories):
     trajectory = []
     ctrl = SwingUpCtrl()
